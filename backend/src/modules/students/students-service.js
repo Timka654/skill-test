@@ -35,16 +35,19 @@ const addNewStudent = async (payload) => {
     try {
         const result = await addOrUpdateStudent(payload);
         if (!result.status) {
-            throw new ApiError(500, result.message);
+            console.error("[addNewStudent] addOrUpdateStudent returned failure:", result);
+            throw new ApiError(500, result.message ?? "addOrUpdateStudent returned status false");
         }
 
         try {
             await sendAccountVerificationEmail({ userId: result.userId, userEmail: payload.email });
             return { message: ADD_STUDENT_AND_EMAIL_SEND_SUCCESS };
         } catch (error) {
+            console.error("Failed to send student verification email:", error);
             return { message: ADD_STUDENT_AND_BUT_EMAIL_SEND_FAIL }
         }
     } catch (error) {
+        console.error("Failed to add student:", error);
         throw new ApiError(500, "Unable to add student");
     }
 }
